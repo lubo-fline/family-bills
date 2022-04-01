@@ -1,0 +1,214 @@
+<!--
+ * @Author: your name
+ * @Date: 2022-03-11 20:08:56
+ * @LastEditTime: 2022-03-31 16:54:50
+ * @LastEditors: Please set LastEditors
+ * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @FilePath: \family-bills\src\views\bills\Index.vue
+-->
+<template>
+    <a-card :bordered="false" size="small" title="账单">
+        <a-form
+            :model="formState"
+            name="horizontal_login"
+            layout="inline"
+            autocomplete="off"
+            @finish="onFinish"
+        >
+            <a-form-item label="月份" name="月份">
+                <a-date-picker v-model:value="formState.dateStr" @change="dateChange" :format="'YYYY-MM'" picker="month" />
+            </a-form-item>
+            <a-form-item label="类型" name="类型">
+                <a-select v-model:value="formState.recordTypeCode" class="width120" :options="recordTypeCodeData"></a-select>
+            </a-form-item>
+            <a-form-item>
+                <a-button type="primary" html-type="submit">搜索</a-button>
+            </a-form-item>
+            <a-form-item>
+                <a-button type="primary" @click="add">新增</a-button>
+            </a-form-item>
+        </a-form>
+        <a-table 
+            class="marginT16" 
+            :data-source="dataSource.arr" :columns="columns" 
+            :pagination="false" :row-key="(record) => record.id"
+            :loading="loading"
+        >
+            <template #bodyCell="{ column, record ,text,index}">
+                <template v-if="column.dataIndex === 'id'">
+                    {{(current-1)*pageSize+index+1}}
+                </template>
+                <template v-else-if="column.dataIndex === 'spendCategoryName'">
+                    <a-tag color="green">
+                        {{text}}
+                    </a-tag>
+                </template>
+                <template v-else-if="column.dataIndex === 'action'">
+                    <a-space>
+                        <a href="javascript:;" @click="editItem(record.id)">修改</a>
+                        <a href="javascript:;" @click="deleteItem(record.id)">删除</a>
+                    </a-space>
+                </template>
+            </template>
+        </a-table>
+        <div class="fl_pagination">
+            <a-pagination
+                v-model:current="current"
+                v-model:pageSize="pageSize"
+                show-size-changer
+                :total="total"
+                @showSizeChange="onShowSizeChange"
+            />
+        </div>
+    </a-card>
+    <addModal :visible="visible" :editId="editId" @handleCancel="handleCancel"></addModal>
+</template>
+
+<script setup lang='ts'>
+    import { onMounted,reactive,watch ,ref} from 'vue';
+    import useCurrentInstance from '../../hooks/useCurrentInstance'
+    const { proxy } = useCurrentInstance()
+    import dayjs,{Dayjs} from 'dayjs';
+    import { Modal } from 'ant-design-vue';
+    import 'ant-design-vue/es/modal/style/css';
+    import addModal from './Add.vue'
+
+    let dataSource=reactive({
+        arr: []
+    });
+    const columns=[
+        {
+            title: '序号',
+            dataIndex: 'id',
+            key:'id'
+        },
+        {
+            title: '金额',
+            dataIndex: 'amount',
+            key:'amount'
+        },
+        {
+            title: '备注',
+            dataIndex: 'remark',
+        },
+        {
+            title: '类别',
+            dataIndex: 'spendCategoryName',
+        },
+        {
+            title: '类型',
+            dataIndex: 'name',
+        },
+        {
+            title: '消费日期',
+            dataIndex: 'occurTime',
+        },
+        {
+            title: '所属人员',
+            dataIndex: 'name',
+        },
+        {
+            title: '操作',
+            dataIndex: 'action',
+        },
+    ]
+    const loading=ref(false)
+    //页码处理
+    const current=ref(1)
+    const pageSize=ref(10)
+    const total=ref(0)
+    const onShowSizeChange = (current: number, pageSize: number) => {
+        current=current
+        pageSize=pageSize
+    };
+    watch(pageSize, () => {
+        getTableData()
+    });
+    watch(current, () => {
+        getTableData()
+    });
+
+    //搜索表单
+    interface FormState {
+        dateStr: Dayjs
+        date:string
+        recordTypeCode: string
+    }
+    const month=(new Date().getMonth()+1)>9?(new Date().getMonth()+1):('0'+(new Date().getMonth()+1))
+    const formState = reactive<FormState>({
+        dateStr: dayjs(new Date().getFullYear()+'-'+month,'YYYY-MM'),
+        date:new Date().getFullYear()+'-'+month,
+        recordTypeCode: 'expendType',
+    });
+    const recordTypeCodeData=[
+        {label:'支出',value:'expendType'},
+        {label:'收入',value:'incomeType'},
+        {label:'预支出',value:'advanceType'}
+    ]
+    const onFinish = (values: any) => {
+        getTableData()
+    };
+    const dateChange=(date:Dayjs,dateStr:string)=>{
+        formState.date=dateStr
+    }
+    
+    //获取表格数据
+    const visible=ref<string>('')
+    onMounted(()=>{
+        getTableData()
+    })
+    const getTableData=()=>{
+        let params={...formState,pageSize:pageSize.value,pageNo:current.value}
+        loading.value=true
+        delete params.dateStr
+        proxy.$post(proxy.$api.bills.list,params).then((res:any)=>{
+            loading.value=false
+            if(res.retCode===0){
+                dataSource.arr=res.data?.list || []
+                total.value=res.data?.total||0
+            }
+        })
+    }
+
+
+    //新增\修改
+    const add=()=>{
+        visible.value='add'
+    }
+    const handleCancel=(flag:boolean)=>{
+        visible.value=''
+        if(flag){
+            getTableData()
+        }
+    }
+    const editId=ref(0)
+    const editItem=(id:number)=>{
+        visible.value='add'
+        editId.value=id
+    }
+    //删除
+    const deleteItem=(id:number)=>{
+        Modal.confirm({
+            title: '提示',
+            content: '是否要删除该数据？',
+            onOk() {
+                proxy.$del(proxy.$api.bills.delete+id).then((res:any)=>{
+                    if(res.retCode===0){
+                        proxy.$message.success('删除成功！');
+                        getTableData()
+                    }
+                })
+            },
+            onCancel() {},
+        });
+    }
+</script>
+<style lang='less' scoped>
+    .fl_pagination{
+        margin-top: 16px;
+        text-align: right;
+    }
+    .pull-right{
+        float: right !important;
+    }
+</style>
