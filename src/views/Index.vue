@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-03-09 21:33:58
- * @LastEditTime: 2022-03-31 17:39:31
+ * @LastEditTime: 2022-04-13 15:34:09
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \family-bills\src\views\Index.vue
@@ -32,10 +32,17 @@
                     theme="dark"
                     mode="horizontal"
                     :style="{ lineHeight: '64px' }"
-                >
-                    <a-menu-item v-for="item in menuData" :key="item.path" @click="goto(item.path)">
-                        {{item.name}}
-                    </a-menu-item>
+                >   
+                    <template v-for="item in menuData" :key="item.path"> 
+                        <a-sub-menu :title="item.name" v-if="item.children&&item.children.length>0">
+                            <a-menu-item v-for="ele in item.children" :key="ele.path" @click="goto(ele.path)">
+                                {{ele.name}}
+                            </a-menu-item>
+                        </a-sub-menu>
+                        <a-menu-item v-else @click="goto(item.path)">
+                            {{item.name}}
+                        </a-menu-item>
+                    </template>
                 </a-menu>
             </a-layout-header>
             <a-layout-content class="fx_containter">
@@ -75,6 +82,20 @@
         {
             name:'系统管理',
             path:'',
+            children:[
+                {
+                    name:'用户管理',
+                    path:'userManage',
+                },
+                {
+                    name:'角色管理',
+                    path:'roleManage',
+                },
+                {
+                    name:'菜单管理',
+                    path:'menuManage',
+                },
+            ]
         },
     ]
     const goto=(path:string)=>{

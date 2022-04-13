@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-03-12 21:38:00
- * @LastEditTime: 2022-03-12 22:54:31
+ * @LastEditTime: 2022-04-13 17:09:10
  * @LastEditors: Please set LastEditors
  * @Description: 新增修改表单
  * @FilePath: \family-bills\src\views\bills\Add.vue
@@ -20,6 +20,7 @@
                 :label-col="{ span: 6 }"
                 :wrapper-col="{ span: 16 }"
                 autocomplete="off"
+                @finish="handleOk"
             >
                 <a-form-item
                     label="金额"
@@ -79,7 +80,7 @@
 
 <script setup lang='ts'>
     import { onMounted,defineProps,defineEmits,reactive,watch ,ref} from 'vue';
-    import useCurrentInstance from '../../hooks/useCurrentInstance'
+    import useCurrentInstance from '@/hooks/useCurrentInstance'
     const { proxy } = useCurrentInstance()
     import dayjs,{Dayjs} from 'dayjs';
 

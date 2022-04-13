@@ -1,13 +1,13 @@
 <!--
  * @Author: your name
- * @Date: 2022-03-11 20:08:56
- * @LastEditTime: 2022-04-13 15:46:58
+ * @Date: 2022-04-13 15:15:16
+ * @LastEditTime: 2022-04-13 16:06:25
  * @LastEditors: Please set LastEditors
- * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- * @FilePath: \family-bills\src\views\bills\Index.vue
+ * @Description: 用户管理
+ * @FilePath: \family-bills\src\views\system\user\Index.vue
 -->
 <template>
-    <a-card :bordered="false" size="small" title="账单">
+    <a-card :bordered="false" size="small" title="用户管理">
         <a-form
             :model="formState"
             name="horizontal_login"
@@ -15,11 +15,14 @@
             autocomplete="off"
             @finish="onFinish"
         >
-            <a-form-item label="月份" name="月份">
-                <a-date-picker v-model:value="formState.dateStr" @change="dateChange" :format="'YYYY-MM'" picker="month" />
+            <a-form-item label="用户名" name="用户名">
+                <a-input v-model:value="formState.username" class="width120"></a-input>
             </a-form-item>
-            <a-form-item label="类型" name="类型">
-                <a-select v-model:value="formState.recordTypeCode" class="width120" :options="recordTypeCodeData"></a-select>
+            <a-form-item label="创建日期" name="创建日期">
+                <a-date-picker v-model:value="formState.dateStr" @change="dateChange" :format="'YYYY-MM-DD'"/>
+            </a-form-item>
+            <a-form-item label="状态" name="状态">
+                <a-select v-model:value="formState.deleted" class="width120" :options="deletedData"></a-select>
             </a-form-item>
             <a-form-item>
                 <a-button type="primary" html-type="submit">搜索</a-button>
@@ -38,10 +41,8 @@
                 <template v-if="column.dataIndex === 'id'">
                     {{(current-1)*pageSize+index+1}}
                 </template>
-                <template v-else-if="column.dataIndex === 'spendCategoryName'">
-                    <a-tag color="green">
-                        {{text}}
-                    </a-tag>
+                <template v-else-if="column.dataIndex === 'deleteTime'">
+                    <a-badge color="green"></a-badge>{{text?'停用':"已启用"}}
                 </template>
                 <template v-else-if="column.dataIndex === 'action'">
                     <a-space>
@@ -83,29 +84,32 @@
             key:'id'
         },
         {
-            title: '金额',
-            dataIndex: 'amount',
-            key:'amount'
+            title: '用户名',
+            dataIndex: 'username',
+            key:'username'
         },
         {
-            title: '备注',
-            dataIndex: 'remark',
+            title: '昵称',
+            dataIndex: 'nickname',
         },
         {
-            title: '类别',
-            dataIndex: 'spendCategoryName',
+            title: '性别',
+            dataIndex: 'sex',
+            customRender:({text, record, index, column})=>{
+                return {1:'男',2:'女'}[text]
+            }
         },
         {
-            title: '类型',
-            dataIndex: 'name',
+            title: '邮箱',
+            dataIndex: 'email',
         },
         {
-            title: '消费日期',
-            dataIndex: 'occurTime',
+            title: '状态',
+            dataIndex: 'deleteTime',
         },
         {
-            title: '所属人员',
-            dataIndex: 'name',
+            title: '更新时间',
+            dataIndex: 'updateTime',
         },
         {
             title: '操作',
@@ -132,18 +136,19 @@
     interface FormState {
         dateStr: Dayjs
         date:string
-        recordTypeCode: string
+        deleted: Boolean,
+        username:string
     }
-    const month=(new Date().getMonth()+1)>9?(new Date().getMonth()+1):('0'+(new Date().getMonth()+1))
     const formState = reactive<FormState>({
-        dateStr: dayjs(new Date().getFullYear()+'-'+month,'YYYY-MM'),
-        date:new Date().getFullYear()+'-'+month,
-        recordTypeCode: 'expendType',
+        dateStr: null,
+        date:'',
+        deleted: null,
+        username:''
     });
-    const recordTypeCodeData=[
-        {label:'支出',value:'expendType'},
-        {label:'收入',value:'incomeType'},
-        {label:'预支出',value:'advanceType'}
+    const deletedData=[
+        {label:'全部',value:null},
+        {label:'正常',value:false},
+        {label:'停用',value:true}
     ]
     const onFinish = (values: any) => {
         getTableData()
@@ -161,7 +166,7 @@
         let params={...formState,pageSize:pageSize.value,pageNo:current.value}
         loading.value=true
         delete params.dateStr
-        proxy.$post(proxy.$api.bills.list,params).then((res:any)=>{
+        proxy.$post(proxy.$api.system.user.list,params).then((res:any)=>{
             loading.value=false
             if(res.retCode===0){
                 dataSource.arr=res.data?.list || []
