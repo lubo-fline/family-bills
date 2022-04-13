@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-03-10 11:12:12
- * @LastEditTime: 2022-03-11 19:38:44
+ * @LastEditTime: 2022-04-01 09:44:56
  * @LastEditors: Please set LastEditors
  * @Description: 登录页面
  * @FilePath: \family-bills\src\views\Login.vue
@@ -59,7 +59,7 @@
             if(res.retCode===0){
                 localStorage.setItem('userData',JSON.stringify(res.data||{}))
                 proxy.$message.success('登录成功！');
-                router.push('/index')
+                router.push('/home')
             }else{
                 proxy.$message.error(res.message);
             }
