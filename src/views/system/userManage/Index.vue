@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-04-13 15:15:16
- * @LastEditTime: 2022-04-13 16:06:25
+ * @LastEditTime: 2022-04-14 10:52:21
  * @LastEditors: Please set LastEditors
  * @Description: 用户管理
  * @FilePath: \family-bills\src\views\system\user\Index.vue
@@ -42,9 +42,9 @@
                     {{(current-1)*pageSize+index+1}}
                 </template>
                 <template v-else-if="column.dataIndex === 'deleteTime'">
-                    <a-badge color="green"></a-badge>{{text?'停用':"已启用"}}
+                    <a-badge :color="text?'red':'green'"></a-badge>{{text?'停用':"已启用"}}
                 </template>
-                <template v-else-if="column.dataIndex === 'action'">
+                <template v-else-if="column.dataIndex === 'action'&&!record.deleteTime">
                     <a-space>
                         <a href="javascript:;" @click="editItem(record.id)">修改</a>
                         <a href="javascript:;" @click="deleteItem(record.id)">删除</a>
@@ -179,6 +179,7 @@
     //新增\修改
     const add=()=>{
         visible.value='add'
+        editId.value=0
     }
     const handleCancel=(flag:boolean)=>{
         visible.value=''
@@ -188,7 +189,7 @@
     }
     const editId=ref(0)
     const editItem=(id:number)=>{
-        visible.value='add'
+        visible.value='edit'
         editId.value=id
     }
     //删除
@@ -197,7 +198,7 @@
             title: '提示',
             content: '是否要删除该数据？',
             onOk() {
-                proxy.$del(proxy.$api.bills.delete+id).then((res:any)=>{
+                proxy.$del(proxy.$api.system.user.delete+id).then((res:any)=>{
                     if(res.retCode===0){
                         proxy.$message.success('删除成功！');
                         getTableData()

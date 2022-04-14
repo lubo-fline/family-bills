@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-04-13 15:15:23
- * @LastEditTime: 2022-04-13 17:43:41
+ * @LastEditTime: 2022-04-14 11:42:41
  * @LastEditors: Please set LastEditors
  * @Description: 用户新增
  * @FilePath: \family-bills\src\views\system\user\Add.vue
@@ -12,6 +12,7 @@
             :visible="visible!=''" 
             :title="visible=='add'?'新增':'修改'" 
             @ok="handleOk"
+            destroyOnClose
             @cancel="handleCancel"
         >
             <a-form
@@ -26,7 +27,7 @@
                     label="用户名" name="username"
                     :rules="rules.username"
                 >
-                    <a-input v-model:value="formState.username" placeholder="请输入用户名"/>
+                    <a-input v-model:value="formState.username" :disabled="visible=='edit'" placeholder="请输入用户名"/>
                 </a-form-item>
                 <a-form-item
                     label="昵称" name="nickname"
@@ -54,6 +55,7 @@
                 <a-form-item
                     label="密码" name="credential"
                     :rules="rules.credential"
+                    v-if="visible=='add'"
                 >
                     <a-input-password v-model:value="formState.credential" placeholder="请输入密码"/>
                 </a-form-item>
@@ -63,7 +65,7 @@
                 >
                     <a-select 
                         v-model:value="formState.roles" 
-                        class="widthP00" 
+                        class="widthP00" mode="multiple"
                         :options="dataSource.rolesData"
                         placeholder="请选择角色权限"
                     ></a-select>
@@ -74,11 +76,10 @@
 </template>
 
 <script setup lang='ts'>
-    import { onMounted,defineProps,defineEmits,reactive,watch ,ref} from 'vue';
+    import { onMounted,defineProps,defineEmits,reactive,watch ,ref,nextTick} from 'vue';
     import useCurrentInstance from '@/hooks/useCurrentInstance'
     import type { FormInstance } from 'ant-design-vue';
     const { proxy } = useCurrentInstance()
-    import dayjs,{Dayjs} from 'dayjs';
 
 
     const prop=defineProps({
@@ -86,13 +87,31 @@
         editId:Number
     })
     const emit=defineEmits(['handleCancel'])
-    
+    onMounted(()=>{
+        getUserData()
+    })
+    watch(prop, () => {
+        for(let item in formState){
+            if(item=='roles'){
+                formState[item]=[]
+            }else if(item =='sex'){
+                formState[item]=1
+            }else{
+                formState[item]=''
+            }
+        }
+        nextTick(()=>{
+            getUserData()
+        })
+    });
+
+
     const formRef = ref<FormInstance>();
     interface FormState {
         username: string
         nickname: string
         email: string
-        credential:string
+        credential?:string
         sex: number,
         roles:number[]
     }
@@ -119,26 +138,67 @@
         formRef.value
         .validate()
         .then(val => {
-            console.log(val)
-            let values=JSON.parse(JSON.stringify(formState))
-            proxy.$post(proxy.$api.bills.add,values)
-            .then((res:any) => {
-                if(res.retCode===0){
-                    handleCancel(true)
-                }
-            })
+            if(prop.visible=='add'){
+                addUser()
+            }else{
+                editUser()
+            }
         })
         .catch(info => {
             console.log('校验失败:', info);
         });
     }
-
+    const addUser=()=>{
+        let values=JSON.parse(JSON.stringify(formState))
+        proxy.$post(proxy.$api.system.user.add,values)
+            .then((res:any) => {
+                if(res.retCode===0){
+                    handleCancel(true)
+                }
+            })
+    }
+    const editUser=()=>{
+        let values=JSON.parse(JSON.stringify(formState))
+        values={
+            id:prop.editId,
+            ...values
+        }
+        delete values.credential
+        delete values.username
+        proxy.$put(proxy.$api.system.user.edit,values)
+            .then((res:any) => {
+                if(res.retCode===0){
+                    handleCancel(true)
+                }
+            })
+    }
     const sexData=[
         {label:'男',value:1},
         {label:'女',value:2}
     ]
     const handleCancel=(flag:Boolean=false)=>{
         emit("handleCancel",flag)
+    }
+    const getUserData=()=>{
+        proxy.$get(`${proxy.$api.system.user.getUserData}/${prop.editId}`)
+            .then((res:any) => {
+                if(res.retCode===0){
+                    let datas=res.data?.allRoles||[]
+                    datas.forEach((item:any)=>{
+                        item['label']=item.info
+                        item['value']=item.id
+                    })
+                    dataSource.rolesData=datas
+                    if(prop.visible=='edit'){
+                        for(let item in formState){
+                            if(item!='roles'){
+                                formState[item]=res.data[item]||''
+                            }
+                        }
+                        formState.roles=res.data?.ownedRoles.map(item=>item.id)||[]
+                    }
+                }
+            })
     }
 </script>
 <style lang='less' scoped>

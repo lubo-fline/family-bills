@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-09 16:36:30
- * @LastEditTime: 2022-04-13 15:54:37
+ * @LastEditTime: 2022-04-14 11:22:26
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \fline-init_vue\src\api\index.js
@@ -22,7 +22,11 @@ const api = {
     },
     system: {
         user: {
-            list:`${baseUrl}/user/page`
+            list: `${baseUrl}/user/page`,
+            add: `${baseUrl}/user/add`,
+            getUserData: `${baseUrl}/user`,
+            delete: `${baseUrl}/user/`,
+            edit:`${baseUrl}/user/edit`
         }
     }
 }
