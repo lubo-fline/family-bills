@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-09 16:36:30
- * @LastEditTime: 2022-04-15 15:59:10
+ * @LastEditTime: 2022-04-15 17:12:42
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \fline-init_vue\src\api\index.js
@@ -50,6 +50,11 @@ const api = {
             delete: `${baseUrl}/payType/`,
             selectList: `${baseUrl}/payType/list`,
             save:`${baseUrl}/payType/save`
+        },
+        spendCategory:{
+            list: `${baseUrl}/spendCategory/page`,
+            delete: `${baseUrl}/spendCategory/`,
+            save:`${baseUrl}/spendCategory/save`
         }
     }
 }

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2022-03-09 20:39:26
- * @LastEditTime: 2022-04-13 09:59:51
+ * @LastEditTime: 2022-04-15 17:18:23
  * @LastEditors: Please set LastEditors
  * @Description: 全局配置
  * @FilePath: \family-bills\vite.config.ts
@@ -59,7 +59,7 @@ module.exports = {
 			'/api': {
 				target: 'https://127.0.0.1',
 				ws: false,
-        changeOrigin: true
+        		changeOrigin: true
 			}
 		}
 	}

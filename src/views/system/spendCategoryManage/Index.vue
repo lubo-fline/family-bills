@@ -1,13 +1,13 @@
 <!--
  * @Author: your name
  * @Date: 2022-04-15 14:36:56
- * @LastEditTime: 2022-04-15 16:59:38
+ * @LastEditTime: 2022-04-15 17:13:13
  * @LastEditors: Please set LastEditors
- * @Description: 支付方式管理页面
+ * @Description: 消费类别管理页面
  * @FilePath: \family-bills\src\views\system\payTypeManage\Index.vue
 -->
 <template>
-    <a-card :bordered="false" size="small" title="支付方式管理">
+    <a-card :bordered="false" size="small" title="消费类别管理">
         <a-button type="primary" @click="add">新增</a-button>
         <a-table 
             class="marginT16" 
@@ -15,9 +15,12 @@
             :pagination="false" :row-key="(record) => record.id"
             :loading="loading"
         >
-            <template #bodyCell="{ column, record ,index}">
+            <template #bodyCell="{ column, record ,text,index}">
                 <template v-if="column.dataIndex === 'id'">
                     {{(current-1)*pageSize+index+1}}
+                </template>
+                <template v-else-if="column.dataIndex === 'recordTypeId'">
+                    {{recordTypeData.find(item=>item.id==text)?.name}}
                 </template>
                 <template v-else-if="column.dataIndex === 'action'">
                     <a-space>
@@ -37,7 +40,7 @@
             />
         </div>
     </a-card>
-    <addModal :visible="visible" :editData="dataSource.editData" :treeData="dataSource.arr" @handleCancel="handleCancel"></addModal>
+    <addModal :visible="visible" :editData="dataSource.editData" :recordTypeData="recordTypeData" @handleCancel="handleCancel"></addModal>
 </template>
 
 <script setup lang='ts'>
@@ -59,8 +62,16 @@
             key:'id'
         },
         {
-            title: '支付方式',
+            title: '消费类别',
             dataIndex: 'name',
+        },
+        {
+            title: '所属分类',
+            dataIndex: 'recordTypeId',
+        },
+        {
+            title: '创建时间',
+            dataIndex: 'createTime',
         },
         {
             title: '操作',
@@ -90,11 +101,12 @@
     const visible=ref<string>('')
     onMounted(()=>{
         getTableData()
+        getRecordTypeData()
     })
     const getTableData=()=>{
         let params={pageSize:pageSize.value,pageIndex:current.value}
         loading.value=true
-        proxy.$get(proxy.$api.system.payType.list,params).then((res:any)=>{
+        proxy.$get(proxy.$api.system.spendCategory.list,params).then((res:any)=>{
             loading.value=false
             if(res.retCode===0){
                 dataSource.arr=res.data.list || []
@@ -125,7 +137,7 @@
             title: '提示',
             content: '是否要删除该数据？',
             onOk() {
-                proxy.$del(proxy.$api.system.payType.delete+id).then((res:any)=>{
+                proxy.$del(proxy.$api.system.spendCategory.delete+id).then((res:any)=>{
                     if(res.retCode===0){
                         proxy.$message.success('删除成功！');
                         getTableData()
@@ -134,6 +146,19 @@
             },
             onCancel() {},
         });
+    }
+    const recordTypeData=ref([])
+    const getRecordTypeData=()=>{
+        proxy.$get(proxy.$api.bills.recordTypeData).then((res:any)=>{
+            if(res.retCode===0){
+                let datas=res.data||[]
+                datas.forEach(item=>{
+                    item['label']=item.name
+                    item['value']=item.id
+                })
+                recordTypeData.value=datas
+            }
+        })
     }
 </script>
 <style lang='less' scoped>
