@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-04-13 15:15:16
- * @LastEditTime: 2022-04-14 10:52:21
+ * @LastEditTime: 2022-04-14 16:50:22
  * @LastEditors: Please set LastEditors
  * @Description: 用户管理
  * @FilePath: \family-bills\src\views\system\user\Index.vue
@@ -42,12 +42,15 @@
                     {{(current-1)*pageSize+index+1}}
                 </template>
                 <template v-else-if="column.dataIndex === 'deleteTime'">
-                    <a-badge :color="text?'red':'green'"></a-badge>{{text?'停用':"已启用"}}
+                    <a-badge :color="text?'gray':'green'"></a-badge>{{text?'停用':"已启用"}}
                 </template>
-                <template v-else-if="column.dataIndex === 'action'&&!record.deleteTime">
+                <template v-else-if="column.dataIndex === 'action'">
                     <a-space>
-                        <a href="javascript:;" @click="editItem(record.id)">修改</a>
-                        <a href="javascript:;" @click="deleteItem(record.id)">删除</a>
+                        <template v-if="!record.deleteTime">
+                            <a href="javascript:;" @click="editItem(record.id)">修改</a>
+                            <a href="javascript:;" @click="deleteItem(record.id)">删除</a>
+                        </template>
+                        <a href="javascript:;" v-else @click="resetItem(record.id)">启用</a>
                     </a-space>
                 </template>
             </template>
@@ -201,6 +204,21 @@
                 proxy.$del(proxy.$api.system.user.delete+id).then((res:any)=>{
                     if(res.retCode===0){
                         proxy.$message.success('删除成功！');
+                        getTableData()
+                    }
+                })
+            },
+            onCancel() {},
+        });
+    }
+    const resetItem=(id:number)=>{
+        Modal.confirm({
+            title: '提示',
+            content: '是否要启用该数据？',
+            onOk() {
+                proxy.$put(proxy.$api.system.user.reset+id).then((res:any)=>{
+                    if(res.retCode===0){
+                        proxy.$message.success('启用成功！');
                         getTableData()
                     }
                 })

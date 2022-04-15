@@ -47,7 +47,7 @@
                 >
                     <a-select 
                         v-model:value="formState.recordTypeCode" 
-                        class="widthP00" 
+                        class="widthP100" 
                         :options="recordTypeData"
                         @change="getSpendCategoryData"
                         placeholder="请选择记账类型"

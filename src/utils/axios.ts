@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2022-03-09 20:57:05
- * @LastEditTime: 2022-03-31 16:35:57
+ * @LastEditTime: 2022-04-14 15:35:08
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \family-bills\src\utils\axios.ts
@@ -12,8 +12,10 @@ import message from 'ant-design-vue/es/message'
 // 添加请求拦截器
 axios.interceptors.request.use((req) => {
     const userData = localStorage.getItem('userData') || ''
-    req.headers = {
-        "token": JSON.parse(userData).token,
+    if (userData != '') {
+        req.headers = {
+            "token": JSON.parse(userData).token,
+        }
     }
     // 统一设置传header
     return req;

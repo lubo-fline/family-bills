@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-04-13 15:15:23
- * @LastEditTime: 2022-04-14 11:42:41
+ * @LastEditTime: 2022-04-14 16:03:57
  * @LastEditors: Please set LastEditors
  * @Description: 用户新增
  * @FilePath: \family-bills\src\views\system\user\Add.vue
@@ -41,7 +41,7 @@
                 >
                     <a-select 
                         v-model:value="formState.sex" 
-                        class="widthP00" 
+                        class="widthP100" 
                         :options="sexData"
                         placeholder="请选择性别"
                     ></a-select>
@@ -65,7 +65,7 @@
                 >
                     <a-select 
                         v-model:value="formState.roles" 
-                        class="widthP00" mode="multiple"
+                        class="widthP100" mode="multiple"
                         :options="dataSource.rolesData"
                         placeholder="请选择角色权限"
                     ></a-select>
@@ -153,6 +153,7 @@
         proxy.$post(proxy.$api.system.user.add,values)
             .then((res:any) => {
                 if(res.retCode===0){
+                    proxy.$message.success('新增成功！');
                     handleCancel(true)
                 }
             })
@@ -168,6 +169,7 @@
         proxy.$put(proxy.$api.system.user.edit,values)
             .then((res:any) => {
                 if(res.retCode===0){
+                    proxy.$message.success('修改成功！');
                     handleCancel(true)
                 }
             })
