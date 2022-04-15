@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-04-13 15:15:16
- * @LastEditTime: 2022-04-14 16:50:22
+ * @LastEditTime: 2022-04-15 16:21:34
  * @LastEditors: Please set LastEditors
  * @Description: 用户管理
  * @FilePath: \family-bills\src\views\system\user\Index.vue
@@ -15,13 +15,13 @@
             autocomplete="off"
             @finish="onFinish"
         >
-            <a-form-item label="用户名" name="用户名">
+            <a-form-item label="用户名" name="username">
                 <a-input v-model:value="formState.username" class="width120"></a-input>
             </a-form-item>
-            <a-form-item label="创建日期" name="创建日期">
+            <a-form-item label="创建日期" name="dateStr">
                 <a-date-picker v-model:value="formState.dateStr" @change="dateChange" :format="'YYYY-MM-DD'"/>
             </a-form-item>
-            <a-form-item label="状态" name="状态">
+            <a-form-item label="状态" name="deleted">
                 <a-select v-model:value="formState.deleted" class="width120" :options="deletedData"></a-select>
             </a-form-item>
             <a-form-item>

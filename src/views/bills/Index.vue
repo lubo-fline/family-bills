@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-03-11 20:08:56
- * @LastEditTime: 2022-04-15 15:43:46
+ * @LastEditTime: 2022-04-15 16:25:56
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \family-bills\src\views\bills\Index.vue
@@ -15,11 +15,14 @@
             autocomplete="off"
             @finish="onFinish"
         >
-            <a-form-item label="月份" name="月份">
+            <a-form-item label="月份" name="dateStr">
                 <a-date-picker v-model:value="formState.dateStr" @change="dateChange" :format="'YYYY-MM'" picker="month" />
             </a-form-item>
-            <a-form-item label="类型" name="类型">
+            <a-form-item label="类型" name="recordTypeCode">
                 <a-select v-model:value="formState.recordTypeCode" class="width120" :options="recordTypeCodeData"></a-select>
+            </a-form-item>
+            <a-form-item label="用户" name="userId">
+                <a-select v-model:value="formState.userId" class="width120" :options="dataSource.userData"></a-select>
             </a-form-item>
             <a-form-item>
                 <a-button type="primary" html-type="submit">搜索</a-button>
@@ -75,7 +78,8 @@
 
     let dataSource=reactive({
         arr: [],
-        editData:{}
+        editData:{},
+        userData:[]
     });
     const columns=[
         {
@@ -133,13 +137,15 @@
     interface FormState {
         dateStr: Dayjs
         date:string
-        recordTypeCode: string
+        recordTypeCode: string,
+        userId:number
     }
     const month=(new Date().getMonth()+1)>9?(new Date().getMonth()+1):('0'+(new Date().getMonth()+1))
     const formState = reactive<FormState>({
         dateStr: dayjs(new Date().getFullYear()+'-'+month,'YYYY-MM'),
         date:new Date().getFullYear()+'-'+month,
         recordTypeCode: 'expendType',
+        userId:0
     });
     const recordTypeCodeData=[
         {label:'支出',value:'expendType'},
@@ -158,6 +164,7 @@
     const visible=ref<string>('')
     onMounted(()=>{
         getTableData()
+        getUserData()
     })
     const getTableData=()=>{
         let params={...formState,pageSize:pageSize.value,pageNo:current.value}
@@ -172,7 +179,20 @@
         })
     }
 
-
+    const getUserData=()=>{
+        let params={pageSize:100,pageNo:1}
+        proxy.$post(proxy.$api.system.user.list,params).then((res:any)=>{
+            loading.value=false
+            if(res.retCode===0){
+                let datas=res.data?.list || []
+                datas.forEach(item=>{
+                    item['label']=item.nickname
+                    item['value']=item.id
+                })
+                dataSource.userData=[{label:'全部',value:0},...datas]
+            }
+        })
+    }
     //新增\修改
     const add=()=>{
         visible.value='add'
