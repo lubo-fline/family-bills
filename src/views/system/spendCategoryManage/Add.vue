@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-04-15 16:55:17
- * @LastEditTime: 2022-04-15 17:13:03
+ * @LastEditTime: 2022-04-15 17:19:31
  * @LastEditors: Please set LastEditors
  * @Description: 消费类别新增
  * @FilePath: \family-bills\src\views\system\spendCategoryManage\Add.vue
@@ -106,6 +106,9 @@
     }
     const addUser=()=>{
         let values=JSON.parse(JSON.stringify(formState))
+        if(prop.visible=='add'){
+            delete values.id
+        }
         proxy.$post(proxy.$api.system.spendCategory.save,values)
             .then((res:any) => {
                 if(res.retCode===0){
