@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-03-12 21:38:00
- * @LastEditTime: 2022-04-13 17:09:10
+ * @LastEditTime: 2022-04-15 16:04:46
  * @LastEditors: Please set LastEditors
  * @Description: 新增修改表单
  * @FilePath: \family-bills\src\views\bills\Add.vue
@@ -12,6 +12,7 @@
             :visible="visible!=''" 
             :title="visible=='add'?'新增':'修改'" 
             @ok="handleOk"
+            destroyOnClose
             @cancel="handleCancel"
         >
             <a-form
@@ -21,16 +22,17 @@
                 :wrapper-col="{ span: 16 }"
                 autocomplete="off"
                 @finish="handleOk"
+                ref="formRef"
             >
                 <a-form-item
-                    label="金额"
+                    label="金额" name="amount"
                     :rules="rules.amount"
                 >
                     <a-input-number v-model:value="formState.amount" class="widthP100" placeholder="请输入金额"/>
                 </a-form-item>
 
                 <a-form-item
-                    label="消费日期"
+                    label="消费日期" name="occurTime"
                     :rules="rules.occurTime"
                 >
                     <a-date-picker 
@@ -42,19 +44,30 @@
                     />
                 </a-form-item>
                 <a-form-item
-                    label="记账类型"
+                    label="记账类型" name="recordTypeCode"
                     :rules="rules.recordTypeCode"
                 >
                     <a-select 
                         v-model:value="formState.recordTypeCode" 
                         class="widthP100" 
                         :options="recordTypeData"
-                        @change="getSpendCategoryData"
+                        @change="(val,datas)=>getSpendCategoryData(datas,'change')"
                         placeholder="请选择记账类型"
                     ></a-select>
                 </a-form-item>
                 <a-form-item
-                    label="消费类别"
+                    label="支付方式" name="payTypeId"
+                    :rules="rules.payTypeId"
+                >
+                    <a-select 
+                        v-model:value="formState.payTypeId" 
+                        class="widthP100" 
+                        :options="payTypeData"
+                        placeholder="请选择支付方式"
+                    ></a-select>
+                </a-form-item>
+                <a-form-item
+                    label="消费类别" name="spendCategoryId"
                     :rules="rules.spendCategoryId"
                 >
                     <a-select 
@@ -65,7 +78,7 @@
                     ></a-select>
                 </a-form-item>
                 <a-form-item
-                    label="备注"
+                    label="备注" name="remark"
                 >
                     <a-textarea
                         v-model:value="formState.remark"
@@ -82,74 +95,124 @@
     import { onMounted,defineProps,defineEmits,reactive,watch ,ref} from 'vue';
     import useCurrentInstance from '@/hooks/useCurrentInstance'
     const { proxy } = useCurrentInstance()
+    import type { FormInstance } from 'ant-design-vue';
     import dayjs,{Dayjs} from 'dayjs';
 
 
     const prop=defineProps({
         visible:String,
-        editId:Number
+        editData:Object,
+        recordTypeCode:String
     })
     const emit=defineEmits(['handleCancel'])
-    
+    watch(prop, () => {
+        if(prop.visible=='add'){
+            for(let item in formState){
+                formState[item]=''
+            }
+        }else{
+            for(let item in formState){
+                formState[item]=prop.editData[item]
+            }
+            formState.occurTimeStr=dayjs(formState.occurTime,'YYYY-MM-DD')
+        }
+        formState.recordTypeCode=prop.recordTypeCode
+        getSpendCategoryData(recordTypeData.value.find(item=>item.code==prop.recordTypeCode),'edit')
+    });
     interface FormState {
         amount: number|string
         occurTime: string
         remark: string
         occurTimeStr:Dayjs
-        recordTypeCode:number|string
-        spendCategoryId: number|string
+        recordTypeCode:string
+        spendCategoryId: number|string,
+        payTypeId: number|string,
     }
     const month=(new Date().getMonth()+1)>9?(new Date().getMonth()+1):('0'+(new Date().getMonth()+1))
     const date=new Date().getDate()>9?new Date().getDate():('0'+new Date().getDate())
+    const formRef = ref<FormInstance>();
     const formState = reactive<FormState>({
         amount: '',
         occurTime: new Date().getFullYear()+'-'+month+'-'+date,
         occurTimeStr:dayjs(new Date().getFullYear()+'-'+month+'-'+date,'YYYY-MM-DD'),
         remark:'',
         spendCategoryId:'',
-        recordTypeCode:''
+        recordTypeCode:'',
+        payTypeId:'',
     });
     const rules={
         amount:[{ required: true, message: '请输入金额!' }],
         occurTime:[{ required: true, message: '请输入消费日期！' }],
         spendCategoryId:[{ required: true, message: '请选择记账类型！' }],
         recordTypeCode:[{ required: true, message: '请选择消费类别！' }],
+        payTypeId:[{ required: true, message: '请选择消费类别！' }],
     }
     const dateChange=(date:Dayjs,dateStr:string)=>{
         formState.occurTime=dateStr
     }
     const handleOk=()=>{
+        formRef.value
+        .validate()
+        .then(val => {
+            if(prop.visible=='add'){
+                addBills()
+            }else{
+                editBills()
+            }
+        })
+        .catch(info => {
+            console.log('校验失败:', info);
+        });
+    }
+    const addBills=()=>{
         let values=JSON.parse(JSON.stringify(formState))
         delete values.occurTimeStr
         delete values.recordTypeCode
         proxy.$post(proxy.$api.bills.add,values)
-        .then((res:any) => {
-            if(res.retCode===0){
-                handleCancel(true)
-            }
-        })
+            .then((res:any) => {
+                if(res.retCode===0){
+                    proxy.$message.success('新增成功！');
+                    handleCancel(true)
+                }
+            })
+    }
+    const editBills=()=>{
+        let values=JSON.parse(JSON.stringify(formState))
+        delete values.occurTimeStr
+        delete values.recordTypeCode
+        proxy.$put(proxy.$api.bills.edit+prop.editData.id,values)
+            .then((res:any) => {
+                if(res.retCode===0){
+                    proxy.$message.success('修改成功！');
+                    handleCancel(true)
+                }
+            })
     }
 
     const recordTypeData=ref([])
     const spendCategoryData=ref([])
+    const payTypeData=ref([])
     onMounted(()=>{
         getRecordTypeData()
+        getPayTypeData()
     })
     const getRecordTypeData=()=>{
         proxy.$get(proxy.$api.bills.recordTypeData).then((res:any)=>{
             if(res.retCode===0){
                 const datas=res.data||[]
                 datas.forEach((item:any)=>{
-                    item['value']=item.id
+                    item['value']=item.code
                     item['label']=item.name
                 })
                 recordTypeData.value=datas
             }
         })
     }
-    const getSpendCategoryData=(id:number)=>{
-        formState.spendCategoryId=''
-        proxy.$get(proxy.$api.bills.spendCategory+id).then((res:any)=>{
+    const getSpendCategoryData=(datas,type:string)=>{
+        if(type=='change'){
+            formState.spendCategoryId=''
+        }
+        proxy.$get(proxy.$api.bills.spendCategory+datas.id).then((res:any)=>{
             if(res.retCode===0){
                 const datas=res.data||[]
                 datas.forEach((item:any)=>{
@@ -157,6 +220,18 @@
                     item['label']=item.name
                 })
                 spendCategoryData.value=datas
+            }
+        })
+    }
+    const getPayTypeData=()=>{
+        proxy.$get(proxy.$api.system.payType.selectList).then((res:any)=>{
+            if(res.retCode===0){
+                const datas=res.data||[]
+                datas.forEach((item:any)=>{
+                    item['value']=item.id
+                    item['label']=item.name
+                })
+                payTypeData.value=datas
             }
         })
     }

@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-03-11 20:08:56
- * @LastEditTime: 2022-04-13 15:46:58
+ * @LastEditTime: 2022-04-15 15:43:46
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \family-bills\src\views\bills\Index.vue
@@ -45,7 +45,7 @@
                 </template>
                 <template v-else-if="column.dataIndex === 'action'">
                     <a-space>
-                        <a href="javascript:;" @click="editItem(record.id)">修改</a>
+                        <a href="javascript:;" @click="editItem(record)">修改</a>
                         <a href="javascript:;" @click="deleteItem(record.id)">删除</a>
                     </a-space>
                 </template>
@@ -61,7 +61,7 @@
             />
         </div>
     </a-card>
-    <addModal :visible="visible" :editId="editId" @handleCancel="handleCancel"></addModal>
+    <addModal :visible="visible" :editData="dataSource.editData" :recordTypeCode="formState.recordTypeCode" @handleCancel="handleCancel"></addModal>
 </template>
 
 <script setup lang='ts'>
@@ -74,7 +74,8 @@
     import addModal from './Add.vue'
 
     let dataSource=reactive({
-        arr: []
+        arr: [],
+        editData:{}
     });
     const columns=[
         {
@@ -92,12 +93,12 @@
             dataIndex: 'remark',
         },
         {
-            title: '类别',
+            title: '消费类别',
             dataIndex: 'spendCategoryName',
         },
         {
-            title: '类型',
-            dataIndex: 'name',
+            title: '支付方式',
+            dataIndex: 'payTypeName',
         },
         {
             title: '消费日期',
@@ -105,7 +106,7 @@
         },
         {
             title: '所属人员',
-            dataIndex: 'name',
+            dataIndex: 'userName',
         },
         {
             title: '操作',
@@ -146,6 +147,7 @@
         {label:'预支出',value:'advanceType'}
     ]
     const onFinish = (values: any) => {
+        current.value=1
         getTableData()
     };
     const dateChange=(date:Dayjs,dateStr:string)=>{
@@ -174,6 +176,7 @@
     //新增\修改
     const add=()=>{
         visible.value='add'
+        dataSource.editData={}
     }
     const handleCancel=(flag:boolean)=>{
         visible.value=''
@@ -182,9 +185,9 @@
         }
     }
     const editId=ref(0)
-    const editItem=(id:number)=>{
-        visible.value='add'
-        editId.value=id
+    const editItem=(datas:object)=>{
+        visible.value='edit'
+        dataSource.editData=datas
     }
     //删除
     const deleteItem=(id:number)=>{

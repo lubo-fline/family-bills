@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2022-03-09 20:57:05
- * @LastEditTime: 2022-04-13 15:45:57
+ * @LastEditTime: 2022-04-15 14:49:06
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \family-bills\src\router\index.ts
@@ -44,6 +44,11 @@ const router = createRouter({
 					path: "/menuManage",
 					name: "menuManage",
 					component: ()=>import('@/views/system/menuManage/Index.vue'),
+				},
+				{
+					path: "/payTypeManage",
+					name: "payTypeManage",
+					component: ()=>import('@/views/system/payTypeManage/Index.vue'),
 				},
 			]
 		},
