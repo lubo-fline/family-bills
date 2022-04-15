@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-04-13 15:35:04
- * @LastEditTime: 2022-04-15 11:47:18
+ * @LastEditTime: 2022-04-15 14:17:41
  * @LastEditors: Please set LastEditors
  * @Description: 菜单管理列表
  * @FilePath: \family-bills\src\views\system\menu\Index.vue
@@ -23,7 +23,7 @@
                 <template v-else-if="column.dataIndex === 'menuType'">
                     <a-tag>{{menuTypeMap[text]}}</a-tag>
                 </template>
-                <template v-else-if="column.dataIndex === 'outerChain'">
+                <template v-else-if="column.dataIndex === 'isOuterChain'">
                     <a-tag color="orange">{{text?'是':'否'}}</a-tag>
                 </template>
                 <template v-else-if="column.dataIndex === 'action'">
@@ -74,7 +74,7 @@
         },
         {
             title: '是否外链',
-            dataIndex: 'outerChain',
+            dataIndex: 'isOuterChain',
             width:120,
         },
         {

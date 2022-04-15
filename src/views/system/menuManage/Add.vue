@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-04-13 15:35:03
- * @LastEditTime: 2022-04-15 11:57:49
+ * @LastEditTime: 2022-04-15 14:17:21
  * @LastEditors: Please set LastEditors
  * @Description: 菜单管理新增
  * @FilePath: \family-bills\src\views\system\menu\Add.vue
@@ -126,7 +126,6 @@
             for(let item in formState){
                 formState[item]=prop.editData[item]
             }
-            console.log(formState.outerChain)
         }
     });
     const fieldNames: TreeSelectProps['fieldNames'] = {
