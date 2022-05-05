@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-04-13 15:15:16
- * @LastEditTime: 2022-04-15 16:21:34
+ * @LastEditTime: 2022-05-05 14:03:16
  * @LastEditors: Please set LastEditors
  * @Description: 用户管理
  * @FilePath: \family-bills\src\views\system\user\Index.vue
@@ -14,6 +14,7 @@
             layout="inline"
             autocomplete="off"
             @finish="onFinish"
+            ref="searchFormRef"
         >
             <a-form-item label="用户名" name="username">
                 <a-input v-model:value="formState.username" class="width120"></a-input>
@@ -26,6 +27,9 @@
             </a-form-item>
             <a-form-item>
                 <a-button type="primary" html-type="submit">搜索</a-button>
+            </a-form-item>
+            <a-form-item>
+                <a-button type="default" @click="reset">重置</a-button>
             </a-form-item>
             <a-form-item>
                 <a-button type="primary" @click="add">新增</a-button>
@@ -76,6 +80,7 @@
     import { Modal } from 'ant-design-vue';
     import 'ant-design-vue/es/modal/style/css';
     import addModal from './Add.vue'
+    import type { FormInstance } from 'ant-design-vue';
 
     let dataSource=reactive({
         arr: []
@@ -142,20 +147,28 @@
         deleted: Boolean,
         username:string
     }
-    const formState = reactive<FormState>({
+    let formState = reactive<FormState>({
         dateStr: null,
         date:'',
         deleted: null,
         username:''
     });
+    const searchFormRef = ref<FormInstance>();
+    const initFormState=JSON.parse(JSON.stringify(formState))
+    
     const deletedData=[
         {label:'全部',value:null},
         {label:'正常',value:false},
         {label:'停用',value:true}
     ]
-    const onFinish = (values: any) => {
+    const onFinish = (values?: any) => {
         getTableData()
     };
+    const reset=()=>{
+        searchFormRef.value.resetFields();
+        formState=initFormState
+        onFinish()
+    }
     const dateChange=(date:Dayjs,dateStr:string)=>{
         formState.date=dateStr
     }

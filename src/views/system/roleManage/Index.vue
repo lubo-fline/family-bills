@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-04-13 15:35:00
- * @LastEditTime: 2022-04-15 16:21:45
+ * @LastEditTime: 2022-05-05 14:06:28
  * @LastEditors: Please set LastEditors
  * @Description: 角色管理列表
  * @FilePath: \family-bills\src\views\system\role\Index.vue
@@ -14,6 +14,7 @@
             layout="inline"
             autocomplete="off"
             @finish="onFinish"
+            ref="searchFormRef"
         >
             <a-form-item label="角色名称" name="name">
                 <a-input v-model:value="formState.name" class="width120"></a-input>
@@ -26,6 +27,9 @@
             </a-form-item>
             <a-form-item>
                 <a-button type="primary" html-type="submit">搜索</a-button>
+            </a-form-item>
+            <a-form-item>
+                <a-button type="default" @click="reset">重置</a-button>
             </a-form-item>
             <a-form-item>
                 <a-button type="primary" @click="add">新增</a-button>
@@ -79,6 +83,7 @@
     import 'ant-design-vue/es/modal/style/css';
     import addModal from './Add.vue'
     import editModal from './Edit.vue'
+    import type { FormInstance } from 'ant-design-vue';
 
     let dataSource=reactive({
         arr: [],
@@ -135,20 +140,28 @@
         deleted: Boolean,
         name:string
     }
-    const formState = reactive<FormState>({
+    let formState = reactive<FormState>({
         dateStr: null,
         date:'',
         deleted: null,
         name:''
     });
+    const searchFormRef = ref<FormInstance>();
+    const initFormState=JSON.parse(JSON.stringify(formState))
+
     const deletedData=[
         {label:'全部',value:null},
         {label:'正常',value:false},
         {label:'停用',value:true}
     ]
-    const onFinish = (values: any) => {
+    const onFinish = (values?: any) => {
         getTableData()
     };
+    const reset=()=>{
+        searchFormRef.value.resetFields();
+        formState=initFormState
+        onFinish()
+    }
     const dateChange=(date:Dayjs,dateStr:string)=>{
         formState.date=dateStr
     }

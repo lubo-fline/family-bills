@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-03-11 20:08:56
- * @LastEditTime: 2022-04-15 16:25:56
+ * @LastEditTime: 2022-05-05 14:01:54
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \family-bills\src\views\bills\Index.vue
@@ -14,6 +14,7 @@
             layout="inline"
             autocomplete="off"
             @finish="onFinish"
+            ref="searchFormRef"
         >
             <a-form-item label="月份" name="dateStr">
                 <a-date-picker v-model:value="formState.dateStr" @change="dateChange" :format="'YYYY-MM'" picker="month" />
@@ -26,6 +27,9 @@
             </a-form-item>
             <a-form-item>
                 <a-button type="primary" html-type="submit">搜索</a-button>
+            </a-form-item>
+            <a-form-item>
+                <a-button type="default" @click="reset">重置</a-button>
             </a-form-item>
             <a-form-item>
                 <a-button type="primary" @click="add">新增</a-button>
@@ -75,6 +79,7 @@
     import { Modal } from 'ant-design-vue';
     import 'ant-design-vue/es/modal/style/css';
     import addModal from './Add.vue'
+    import type { FormInstance } from 'ant-design-vue';
 
     let dataSource=reactive({
         arr: [],
@@ -141,21 +146,28 @@
         userId:number
     }
     const month=(new Date().getMonth()+1)>9?(new Date().getMonth()+1):('0'+(new Date().getMonth()+1))
-    const formState = reactive<FormState>({
+    let formState = reactive<FormState>({
         dateStr: dayjs(new Date().getFullYear()+'-'+month,'YYYY-MM'),
         date:new Date().getFullYear()+'-'+month,
         recordTypeCode: 'expendType',
-        userId:0
+        userId:null
     });
+    const searchFormRef = ref<FormInstance>();
+    const initFormState=JSON.parse(JSON.stringify(formState))
     const recordTypeCodeData=[
         {label:'支出',value:'expendType'},
         {label:'收入',value:'incomeType'},
         {label:'预支出',value:'advanceType'}
     ]
-    const onFinish = (values: any) => {
+    const onFinish = (values?: any) => {
         current.value=1
         getTableData()
     };
+    const reset=()=>{
+        searchFormRef.value.resetFields();
+        formState=initFormState
+        onFinish()
+    }
     const dateChange=(date:Dayjs,dateStr:string)=>{
         formState.date=dateStr
     }
@@ -189,7 +201,7 @@
                     item['label']=item.nickname
                     item['value']=item.id
                 })
-                dataSource.userData=[{label:'全部',value:0},...datas]
+                dataSource.userData=[{label:'全部',value:null},...datas]
             }
         })
     }
