@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-04-14 14:18:59
- * @LastEditTime: 2022-04-15 10:28:42
+ * @LastEditTime: 2022-05-05 14:46:39
  * @LastEditors: Please set LastEditors
  * @Description: 修改角色弹窗
  * @FilePath: \family-bills\src\views\system\roleManage\Edit.vue
@@ -59,10 +59,12 @@
     })
     const emit=defineEmits(['handleCancel'])
     watch(prop, () => {
-        for(let item in formState){
-            formState[item]=prop.editData[item]
+        if(prop.visible=='edit'){
+            for(let item in formState){
+                formState[item]=prop.editData[item]
+            }
+            getMenuTreeData()
         }
-        getMenuTreeData()
     });
 
     const editForm = ref<FormInstance>();
