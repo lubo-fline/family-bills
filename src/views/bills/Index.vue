@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-03-11 20:08:56
- * @LastEditTime: 2022-05-05 14:01:54
+ * @LastEditTime: 2022-05-06 14:54:53
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \family-bills\src\views\bills\Index.vue
@@ -35,6 +35,14 @@
                 <a-button type="primary" @click="add">新增</a-button>
             </a-form-item>
         </a-form>
+        <a-row :gutter="16">
+            <a-col :span="3" :offset="18">
+                <a-statistic title="收入" :precision="2" :value="dataSource.totalStatics.inCome" suffix='元'/>
+            </a-col>
+            <a-col :span="3">
+                <a-statistic title="支出" :precision="2" :value="dataSource.totalStatics.outCome" suffix='元'/>
+            </a-col>
+        </a-row>
         <a-table 
             class="marginT16" 
             :data-source="dataSource.arr" :columns="columns" 
@@ -84,7 +92,11 @@
     let dataSource=reactive({
         arr: [],
         editData:{},
-        userData:[]
+        userData:[],
+        totalStatics:{
+            inCome:0,
+            outCome:0
+        }
     });
     const columns=[
         {
@@ -161,6 +173,7 @@
     ]
     const onFinish = (values?: any) => {
         current.value=1
+        getTotalStaticsData()
         getTableData()
     };
     const reset=()=>{
@@ -177,6 +190,7 @@
     onMounted(()=>{
         getTableData()
         getUserData()
+        getTotalStaticsData()
     })
     const getTableData=()=>{
         let params={...formState,pageSize:pageSize.value,pageNo:current.value}
@@ -237,6 +251,17 @@
             onCancel() {},
         });
     }
+
+    const getTotalStaticsData=()=>{
+        let {userId,date}=formState
+        proxy.$get(proxy.$api.bills.getStatics+date,{userId}).then((res:any)=>{
+            if(res.retCode===0){
+                console.log(res.data)
+                dataSource.totalStatics.inCome=res.data[1]||0
+                dataSource.totalStatics.outCome=res.data[0]||0
+            }
+        })
+    }
 </script>
 <style lang='less' scoped>
     .fl_pagination{
@@ -245,5 +270,9 @@
     }
     .pull-right{
         float: right !important;
+    }
+    .fl_staticsBox{
+        float:right;
+        width: 300px;
     }
 </style>

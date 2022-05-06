@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-03-12 21:38:00
- * @LastEditTime: 2022-04-15 16:04:46
+ * @LastEditTime: 2022-05-06 14:39:16
  * @LastEditors: Please set LastEditors
  * @Description: 新增修改表单
  * @FilePath: \family-bills\src\views\bills\Add.vue
@@ -56,14 +56,14 @@
                     ></a-select>
                 </a-form-item>
                 <a-form-item
-                    label="支付方式" name="payTypeId"
+                    :label="formState.recordTypeCode=='incomeType'?'存储方式':'支付方式'" name="payTypeId"
                     :rules="rules.payTypeId"
                 >
                     <a-select 
                         v-model:value="formState.payTypeId" 
                         class="widthP100" 
                         :options="payTypeData"
-                        placeholder="请选择支付方式"
+                        :placeholder="formState.recordTypeCode=='incomeType'?'请选择存储方式':'请选择支付方式'"
                     ></a-select>
                 </a-form-item>
                 <a-form-item
