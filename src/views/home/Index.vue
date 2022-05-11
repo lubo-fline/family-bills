@@ -1,8 +1,8 @@
 <!--
  * @Author: your name
  * @Date: 2022-03-31 16:58:33
- * @LastEditTime: 2022-04-15 17:58:41
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-05-11 17:54:22
+ * @LastEditors: lubo lubo@fline88.com
  * @Description: 首页
  * @FilePath: \family-bills\src\views\home\Index.vue
 -->
@@ -39,8 +39,45 @@
             </a-col>
             <a-col :span="6" v-for="item in staticsTotalConfigData" :key="item.code">
                 <a-card :bordered="false">
-                    <div>{{item.name}}</div>
-                    <div><span>{{staticsTotalData[item.code]||0}}</span>元</div>
+                    <a-row :gutter="16">
+                        <a-col :span="6">
+                            <img :src='item.image' class='fl_staticsImage'/>
+                        </a-col>
+                        <a-col :span="12">
+                            <div class="fl_staticsTitle">{{item.name}}</div>
+                            <div><span class="fl_staticsValue">{{staticsTotalData[item.code]||0}}</span>元</div>
+                        </a-col>
+                    </a-row>
+                </a-card>
+            </a-col>
+            <a-col :span="8">
+                <a-card size="small" :bordered="false" title="收支趋势">
+                
+                </a-card>
+            </a-col>
+            <a-col :span="8">
+                <a-card size="small" :bordered="false" title="支出类别趋势">
+                
+                </a-card>
+            </a-col>
+            <a-col :span="8">
+                <a-card size="small" :bordered="false" title="收入类别趋势">
+                
+                </a-card>
+            </a-col>
+            <a-col :span="8">
+                <a-card size="small" :bordered="false" title="支付方式环比">
+                
+                </a-card>
+            </a-col>
+            <a-col :span="8">
+                <a-card size="small" :bordered="false" title="支付类别环比">
+                
+                </a-card>
+            </a-col>
+            <a-col :span="8">
+                <a-card size="small" :bordered="false" title="收入类别环比">
+                
                 </a-card>
             </a-col>
         </a-row>
@@ -54,7 +91,10 @@
     import dayjs,{Dayjs} from 'dayjs';
     type RangeValue = [Dayjs, Dayjs];
     import type { FormInstance } from 'ant-design-vue';
-
+    import shouru from '@/assets/image/shouru.svg'
+    import cunkuan from '@/assets/image/cunkuan.svg'
+    import zhichu from '@/assets/image/zhichu.svg'
+    import daiguihuan from '@/assets/image/daiguihuan.svg'
 
     const loading=ref(false)
     let dataSource=reactive({
@@ -112,10 +152,10 @@
         {label:"本周",value:"thisWeek"},
     ]
     const staticsTotalConfigData=[
-        {name:"总收入",code:'shouru'},
-        {name:"总支出",code:'zhichu'},
-        {name:"总存款",code:'cunkuan'},
-        {name:"待归还",code:'return'},
+        {name:"总收入",code:'shouru',image:shouru},
+        {name:"总支出",code:'zhichu',image:zhichu},
+        {name:"总存款",code:'cunkuan',image:cunkuan},
+        {name:"待归还",code:'return',image:daiguihuan},
     ]
     const staticsTotalData={
         shouru:1000,
@@ -125,4 +165,17 @@
     }
 </script>
 <style lang='less' scoped>
+.fl_staticsImage{
+    width: 100%;
+    height: 80px;
+}
+.fl_staticsTitle{
+    font-size: 16px;
+    margin-top: 10px;
+}
+.fl_staticsValue{
+    font-size: 30px;
+    font-weight: bolder;
+    margin-right: 10px;
+}
 </style>

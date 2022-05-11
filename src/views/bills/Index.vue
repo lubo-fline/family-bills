@@ -1,8 +1,8 @@
 <!--
  * @Author: your name
  * @Date: 2022-03-11 20:08:56
- * @LastEditTime: 2022-05-11 15:32:41
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-05-11 17:57:21
+ * @LastEditors: lubo lubo@fline88.com
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \family-bills\src\views\bills\Index.vue
 -->
@@ -59,6 +59,11 @@
                 <template v-else-if="column.dataIndex === 'spendCategoryName'">
                     <a-tag color="green">
                         {{text}}
+                    </a-tag>
+                </template>
+                <template v-else-if="column.dataIndex === 'recordTypeCode'">
+                    <a-tag :color="recordTypeCodeData.find(item=>item.value==text).color">
+                        {{recordTypeCodeData.find(item=>item.value==text).label}}
                     </a-tag>
                 </template>
                 <template v-else-if="column.dataIndex === 'action'">
@@ -118,6 +123,10 @@
             dataIndex: 'remark',
         },
         {
+            title: '类型',
+            dataIndex: 'recordTypeCode',
+        },
+        {
             title: '消费类别',
             dataIndex: 'spendCategoryName',
         },
@@ -172,9 +181,9 @@
     const initFormState=JSON.parse(JSON.stringify(formState))
     const recordTypeCodeData=[
         {label:'全部',value:null},
-        {label:'支出',value:'expendType',classname:''},
-        {label:'收入',value:'incomeType',classname:'bgGreen'},
-        {label:'预支出',value:'advanceType',classname:'bgOrange'}
+        {label:'支出',value:'expendType',classname:'',color:'blue'},
+        {label:'收入',value:'incomeType',classname:'bgGreen',color:'green'},
+        {label:'预支出',value:'advanceType',classname:'bgOrange',color:'orange'}
     ]
     const onFinish = (values?: any) => {
         current.value=1

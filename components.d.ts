@@ -42,6 +42,7 @@ declare module 'vue' {
     Icon: typeof import('./src/components/Icon.vue')['default']
     Index: typeof import('./src/views/Index.vue')['default']
     Login: typeof import('./src/views/Login.vue')['default']
+    Pie: typeof import('./src/views/home/components/Pie.vue')['default']
   }
 }
 
