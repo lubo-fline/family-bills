@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-03-12 21:38:00
- * @LastEditTime: 2022-05-06 14:39:16
+ * @LastEditTime: 2022-05-11 15:27:56
  * @LastEditors: Please set LastEditors
  * @Description: 新增修改表单
  * @FilePath: \family-bills\src\views\bills\Add.vue
@@ -110,14 +110,14 @@
             for(let item in formState){
                 formState[item]=''
             }
+            formState.recordTypeCode=prop.recordTypeCode
         }else{
             for(let item in formState){
                 formState[item]=prop.editData[item]
             }
             formState.occurTimeStr=dayjs(formState.occurTime,'YYYY-MM-DD')
         }
-        formState.recordTypeCode=prop.recordTypeCode
-        getSpendCategoryData(recordTypeData.value.find(item=>item.code==prop.recordTypeCode),'edit')
+        getSpendCategoryData(recordTypeData.value.find(item=>item.code==formState.recordTypeCode),'edit')
     });
     interface FormState {
         amount: number|string
@@ -209,6 +209,9 @@
         })
     }
     const getSpendCategoryData=(datas,type:string)=>{
+        if(!datas||!datas.id){
+            return false
+        }
         if(type=='change'){
             formState.spendCategoryId=''
         }
