@@ -1,8 +1,8 @@
 /*
  * @Author: your name
  * @Date: 2022-03-09 20:39:26
- * @LastEditTime: 2022-04-15 17:18:23
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-08-09 10:22:42
+ * @LastEditors: lubo lubo@fline88.com
  * @Description: 全局配置
  * @FilePath: \family-bills\vite.config.ts
  */
@@ -57,7 +57,7 @@ module.exports = {
 		port: 8080,
 		proxy: {
 			'/api': {
-				target: 'https://127.0.0.1',
+				target: 'https://jizhang.wuququ.xyz/',
 				ws: false,
         		changeOrigin: true
 			}
