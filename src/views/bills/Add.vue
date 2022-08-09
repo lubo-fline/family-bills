@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-03-12 21:38:00
- * @LastEditTime: 2022-08-09 16:39:58
+ * @LastEditTime: 2022-08-09 17:10:20
  * @LastEditors: lubo lubo@fline88.com
  * @Description: 新增修改表单
  * @FilePath: \family-bills\src\views\bills\Add.vue
@@ -120,7 +120,7 @@ import { array } from 'vue-types';
             }
             formState.occurTimeStr=dayjs(formState.occurTime,'YYYY-MM-DD')
         }
-        getSpendCategoryData(prop.recordTypeData.find(item=>item.code==formState.recordTypeCode),'edit')
+        getSpendCategoryData(prop.recordTypeData.find((item:any)=>item.code==formState.recordTypeCode),'edit')
     });
     interface FormState {
         amount: number|string

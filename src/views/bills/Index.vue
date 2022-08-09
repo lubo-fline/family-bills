@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-03-11 20:08:56
- * @LastEditTime: 2022-08-09 16:58:29
+ * @LastEditTime: 2022-08-09 19:03:21
  * @LastEditors: lubo lubo@fline88.com
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \family-bills\src\views\bills\Index.vue
@@ -93,14 +93,20 @@
             </a-space>
         </div>
         <a-row :gutter="16" class="marginT16">
-            <a-col :span="4" v-for="item in dataSource.totalStaticsConfigData" :key="item.code">
-                <a-card size="small" :bordered="false" :bodyStyle="{background:item.color||'red',padding:'12px 24px'}">
+            <a-col :span="item.children.length>0?12:6" v-for="item in dataSource.totalStaticsConfigData" :key="item.code">
+                <a-card size="small" :bordered="false" :bodyStyle="{ background: item.color || 'red', padding: '12px 24px', height: '145px',}">
                     <a-statistic
                         :title="item.label"
                         :precision="2"
                         :value="dataSource.totalStatics[item.code]||0"
                         suffix="元"
                     />
+                    <a-row :gutter="12" v-if="item.children.length>0">
+                        <a-col :span="8" v-for="ele in item.children" :key="ele.code">
+                            <div class="fl_title">{{ele.label}}</div>
+                            <div class="fl_value">{{dataSource.totalStatics[ele.code]||0}}元</div>
+                        </a-col>
+                    </a-row>
                 </a-card>
             </a-col>
         </a-row>
@@ -111,7 +117,6 @@
             :pagination="false"
             :row-key="(record) => record.id"
             :loading="loading"
-            :rowClassName="rowClassName"
         >
             <template #bodyCell="{ column, record, text, index }">
                 <template v-if="column.dataIndex === 'id'">
@@ -180,12 +185,15 @@ let dataSource = reactive({
     editData: {},
     userData: [],
     totalStaticsConfigData: [
-        { label: "收入", code: 'income', color: "rgb(247, 255, 237)" },
-        { label: "支出", code: 'expenditure', color: "rgb(253, 240, 246)" },
-        { label: "预支出", code: 'preExpenditure', color: "rgb(248, 240, 255)" },
-        { label: "花销", code: 'cost', color: "rgb(253, 247, 230)" },
-        { label: "还款", code: 'repayment', color: "rgb(235, 255, 251)" },
-        { label: "转账", code: 'transfer', color: "rgb(233, 247, 255)" },
+        { label: "收入", code: 'income', color: "rgb(247, 255, 237)" ,children:[]},
+        { label: "预支出", code: 'preExpenditure', color: "rgb(253, 247, 230)" ,children:[]},
+        {
+            label: "已支出", code: 'expenditure', color: "rgb(233, 247, 255)", children: [
+                { label: "花销", code: 'cost', color: "rgb(248, 240, 255)" },
+                { label: "还款", code: 'repayment', color: "rgb(235, 255, 251)" },
+                { label: "转账", code: 'transfer', color: "rgb(253, 240, 246)" },
+            ]
+        },
     ],
     totalStatics: {},
     expenditureType: [
@@ -296,15 +304,6 @@ onMounted(() => {
     getPayTypeData();
     getRecordTypeData()
 });
-const rowClassName = (record) => {
-    let className=''
-    if (record.recordTypeCode == 'expendType'&&record.expenditureType === 1) {
-        className='bgOrange'
-    } else if (record.recordTypeCode == 'incomeType') {
-        className='bgGreen'
-    }
-    return className
-};
 const setTagColor = (datas) => {
     let tagInfo = { color: 'blue', label: '已支出' }
     if (datas.recordTypeCode == 'expendType'&&datas.expenditureType === 1) {
@@ -459,5 +458,17 @@ const getSpendCategoryData=(datas)=>{
 .fl_staticsBox {
     float: right;
     width: 300px;
+}
+.fl_title{
+    font-size: 12px;
+    color:rgba(0, 0, 0, 0.45);
+    margin: 4px 0;
+}
+.fl_value{
+    font-size: 20px;
+}
+.fl_line{
+    height: 59px;
+    border-left:1px solid #ccc;
 }
 </style>
