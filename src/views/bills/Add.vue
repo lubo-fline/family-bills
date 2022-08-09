@@ -1,8 +1,8 @@
 <!--
  * @Author: your name
  * @Date: 2022-03-12 21:38:00
- * @LastEditTime: 2022-05-11 15:27:56
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-08-09 16:39:58
+ * @LastEditors: lubo lubo@fline88.com
  * @Description: 新增修改表单
  * @FilePath: \family-bills\src\views\bills\Add.vue
 -->
@@ -50,7 +50,7 @@
                     <a-select 
                         v-model:value="formState.recordTypeCode" 
                         class="widthP100" 
-                        :options="recordTypeData"
+                        :options="prop.recordTypeData"
                         @change="(val,datas)=>getSpendCategoryData(datas,'change')"
                         placeholder="请选择记账类型"
                     ></a-select>
@@ -62,7 +62,7 @@
                     <a-select 
                         v-model:value="formState.payTypeId" 
                         class="widthP100" 
-                        :options="payTypeData"
+                        :options="prop.payTypeData"
                         :placeholder="formState.recordTypeCode=='incomeType'?'请选择存储方式':'请选择支付方式'"
                     ></a-select>
                 </a-form-item>
@@ -94,6 +94,7 @@
 <script setup lang='ts'>
     import { onMounted,defineProps,defineEmits,reactive,watch ,ref} from 'vue';
     import useCurrentInstance from '@/hooks/useCurrentInstance'
+import { array } from 'vue-types';
     const { proxy } = useCurrentInstance()
     import type { FormInstance } from 'ant-design-vue';
     import dayjs,{Dayjs} from 'dayjs';
@@ -102,7 +103,9 @@
     const prop=defineProps({
         visible:String,
         editData:Object,
-        recordTypeCode:String
+        recordTypeCode: String,
+        payTypeData: Array,
+        recordTypeData:Array
     })
     const emit=defineEmits(['handleCancel'])
     watch(prop, () => {
@@ -117,7 +120,7 @@
             }
             formState.occurTimeStr=dayjs(formState.occurTime,'YYYY-MM-DD')
         }
-        getSpendCategoryData(recordTypeData.value.find(item=>item.code==formState.recordTypeCode),'edit')
+        getSpendCategoryData(prop.recordTypeData.find(item=>item.code==formState.recordTypeCode),'edit')
     });
     interface FormState {
         amount: number|string
@@ -189,25 +192,7 @@
             })
     }
 
-    const recordTypeData=ref([])
     const spendCategoryData=ref([])
-    const payTypeData=ref([])
-    onMounted(()=>{
-        getRecordTypeData()
-        getPayTypeData()
-    })
-    const getRecordTypeData=()=>{
-        proxy.$get(proxy.$api.bills.recordTypeData).then((res:any)=>{
-            if(res.retCode===0){
-                const datas=res.data||[]
-                datas.forEach((item:any)=>{
-                    item['value']=item.code
-                    item['label']=item.name
-                })
-                recordTypeData.value=datas
-            }
-        })
-    }
     const getSpendCategoryData=(datas,type:string)=>{
         if(!datas||!datas.id){
             return false
@@ -226,18 +211,7 @@
             }
         })
     }
-    const getPayTypeData=()=>{
-        proxy.$get(proxy.$api.system.payType.selectList).then((res:any)=>{
-            if(res.retCode===0){
-                const datas=res.data||[]
-                datas.forEach((item:any)=>{
-                    item['value']=item.id
-                    item['label']=item.name
-                })
-                payTypeData.value=datas
-            }
-        })
-    }
+    
     const handleCancel=(flag:Boolean=false)=>{
         emit("handleCancel",flag)
     }

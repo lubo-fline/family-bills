@@ -15,7 +15,7 @@ import api from './api/index'
 import { message } from 'ant-design-vue';
 import 'ant-design-vue/es/message/style/css';
 import './assets/less/index.less'
-import * as echarts from 'echarts';
+import echarts from './utils/echarts';
 const app = createApp(App)
 app.use(router).use(store).mount('#app')
 app.config.globalProperties.$get = axiosExpand.get
