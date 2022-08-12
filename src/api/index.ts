@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-09 16:36:30
- * @LastEditTime: 2022-08-09 14:51:47
+ * @LastEditTime: 2022-08-12 15:36:20
  * @LastEditors: lubo lubo@fline88.com
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \fline-init_vue\src\api\index.js
@@ -12,6 +12,9 @@ const api = {
     // 获取认证
     oauthToken: {
         login: `${baseUrl}/user/login`, // 账号密码获取token
+    },
+    analysis: {
+        queryHomeInfo:`${baseUrl}/analysis/queryHomeInfo`
     },
     bills: {
         list: `${baseUrl}/record/listByMonth`,//月账单列表

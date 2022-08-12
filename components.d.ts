@@ -38,11 +38,14 @@ declare module 'vue' {
     ATextarea: typeof import('ant-design-vue/es')['Textarea']
     ATree: typeof import('ant-design-vue/es')['Tree']
     ATreeSelect: typeof import('ant-design-vue/es')['TreeSelect']
+    Bar: typeof import('./src/components/charts/Bar.vue')['default']
+    Base: typeof import('./src/components/charts/Base.vue')['default']
     Edit: typeof import('./src/views/system/roleManage/Edit.vue')['default']
     Icon: typeof import('./src/components/Icon.vue')['default']
     Index: typeof import('./src/views/Index.vue')['default']
+    Line: typeof import('./src/components/charts/Line.vue')['default']
     Login: typeof import('./src/views/Login.vue')['default']
-    Pie: typeof import('./src/views/home/components/Pie.vue')['default']
+    Pie: typeof import('./src/components/charts/Pie.vue')['default']
   }
 }
 

@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-03-12 21:38:00
- * @LastEditTime: 2022-08-09 17:10:20
+ * @LastEditTime: 2022-08-10 16:34:41
  * @LastEditors: lubo lubo@fline88.com
  * @Description: 新增修改表单
  * @FilePath: \family-bills\src\views\bills\Add.vue
@@ -91,14 +91,13 @@
     </div>
 </template>
 
-<script setup lang='ts'>
-    import { onMounted,defineProps,defineEmits,reactive,watch ,ref} from 'vue';
+<script setup lang='ts' name="addModal">
+    import { defineProps,defineEmits,reactive,watch ,ref} from 'vue';
     import useCurrentInstance from '@/hooks/useCurrentInstance'
-import { array } from 'vue-types';
-    const { proxy } = useCurrentInstance()
+    
     import type { FormInstance } from 'ant-design-vue';
     import dayjs,{Dayjs} from 'dayjs';
-
+    const { proxy } = useCurrentInstance()
 
     const prop=defineProps({
         visible:String,
